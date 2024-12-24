@@ -31,6 +31,32 @@ const request = {
     return { params }
   },
 }
+
+let [, v, path] = window.location.pathname.match(/^\/(\d+(?:\.\d+)+)\/(.*)/) || [, ,]
+if (path && v) {
+  const upstream = v.startsWith('3') ? 'https://patch.poecdn.com/' : 'https://patch-poe2.poecdn.com/'
+  path = upstream + v + '/://' + path
+}
+
+// localStorage events don't fire for the tab that created them
+// https://stackoverflow.com/a/75101492/2063518
+const setItem = localStorage.setItem.bind(localStorage)
+localStorage.setItem = (key, value) => {
+  setItem(key, value)
+  if (key === 'my_vuefinder_storage') {
+    try {
+      let { path, adapter } = JSON.parse(value)
+      let version = adapter?.split('/').at(-2)
+      if (!version?.match(/^\d+\./) && window.location.pathname.match(/^\/\d+\./)) {
+        version = window.location.pathname.split('/')[1]
+      }
+      const slash = path.startsWith('/') ? '' : '/'
+      window.history.pushState(null, '', `/${version}${slash}${path}`)
+    } catch (e) {
+      console.debug(e)
+    }
+  }
+}
 </script>
 
 <template>
@@ -44,7 +70,7 @@ const request = {
   </header>
 
   <main>
-    <vue-finder id="my_vuefinder" :request="request" :features="features" />
+    <vue-finder id="my_vuefinder" :request="request" :features="features" :path="path" :full-screen="true" persist />
   </main>
 </template>
 
