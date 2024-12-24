@@ -20,11 +20,9 @@ const request = {
     }
 
     if (params.path?.includes('://')) {
-      console.log('unencoded')
       params.path = params.path?.split('://').at(-1)
     }
     if (params.path?.includes(separator)) {
-      console.log('encoded')
       params.path = params.path?.toLowerCase()?.split(separator).at(-1)
     }
 
@@ -53,7 +51,7 @@ localStorage.setItem = (key, value) => {
       const slash = path.startsWith('/') ? '' : '/'
       window.history.pushState(null, '', `/${version}${slash}${path}`)
     } catch (e) {
-      console.debug(e)
+      console.warn(e)
     }
   }
 }
