@@ -103,4 +103,8 @@ h3 {
     text-align: left;
   }
 }
+
+.vuefinder__explorer__item-path {
+  grid-column: span 5 / span 5;
+}
 </style>
