@@ -6,7 +6,6 @@ const separator = encodeURIComponent('://').toLowerCase()
 
 let [, adapter, path] = window.location.pathname.match(/^\/(\d+(?:\.\d+)+)\/(.*[^/])/) || [, ,]
 if (path && adapter) {
-  console.log(window.location.pathname, adapter, path)
   const upstream = adapter.startsWith('3') ? 'https://patch.poecdn.com/' : 'https://patch-poe2.poecdn.com/'
   adapter = upstream + adapter + '/'
 }
@@ -19,7 +18,6 @@ const request = {
   //     transformed.params = transformResult.params ?? {};
   // }
   transformRequest({ params }) {
-    console.log(params, path, adapter)
     let version = params.adapter?.split('/').at(-2)
     if (!version?.match(/^\d+\./) && window.location.pathname.match(/^\/\d+\./)) {
       version = window.location.pathname.split('/')[1]
