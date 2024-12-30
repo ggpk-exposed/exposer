@@ -33,3 +33,7 @@ a,
     padding: 0 2rem;
   }
 }
+
+.vuefinder__explorer__item-path {
+  grid-column: span 5 / span 5;
+}
