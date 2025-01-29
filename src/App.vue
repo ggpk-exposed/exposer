@@ -61,6 +61,8 @@ localStorage.setItem = (key, value) => {
     }
   }
 }
+
+window.addEventListener("popstate", () => window.location.reload())
 </script>
 
 <template>
