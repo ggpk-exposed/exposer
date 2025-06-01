@@ -5,9 +5,9 @@ const features = [FEATURES.PREVIEW, FEATURES.SEARCH, FEATURES.FULL_SCREEN, FEATU
 const separator = encodeURIComponent('://').toLowerCase()
 
 const ADAPTERS = ["poe1", "poe2"]
-let [, adapter, path] = window.location.pathname.match(/^\/(poe1|poe2)\/(.*[^/])/) || [,,]
-if (!adapter) {
-  adapter = ADAPTERS[0]
+let [, adapter, path] = window.location.pathname.match(/^\/(poe1|poe2|\d+(?:\.\d+)+)\/(.*[^/])/) || [,,]
+if (!ADAPTERS.includes(adapter)) {
+  adapter = adapter?.startsWith("3") ? ADAPTERS[0] : ADAPTERS[1];
 }
 
 const request = {
@@ -22,7 +22,7 @@ const request = {
     if (!ADAPTERS.includes(version)) {
       version = window.location.pathname.split('/')[1]
       if (!ADAPTERS.includes(version)) {
-        version = ADAPTERS[0]
+        version = version?.startsWith("3") ? ADAPTERS[0] : ADAPTERS[1]
       }
       params.adapter = version
     }
