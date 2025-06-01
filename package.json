@@ -14,21 +14,21 @@
     "deploy": "npm run build && wrangler pages deploy ./dist"
   },
   "dependencies": {
-    "vue": "^3.5.13",
-    "vuefinder": "^2.7.0"
+    "vue": "^3.5.16",
+    "vuefinder": "^2.7.1"
   },
   "devDependencies": {
-    "@eslint/js": "^9.14.0",
-    "@vitejs/plugin-vue": "^5.2.1",
-    "@vue/eslint-config-prettier": "^10.1.0",
-    "eslint": "^9.14.0",
-    "eslint-plugin-oxlint": "^0.11.0",
-    "eslint-plugin-vue": "^9.30.0",
-    "npm-run-all2": "^7.0.1",
-    "oxlint": "^0.11.0",
-    "prettier": "^3.3.3",
-    "vite": "^6.0.1",
-    "vite-plugin-vue-devtools": "^7.6.5",
-    "wrangler": "^3.99.0"
+    "@eslint/js": "^9.28.0",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "@vue/eslint-config-prettier": "^10.2.0",
+    "eslint": "^9.28.0",
+    "eslint-plugin-oxlint": "^0.17.0",
+    "eslint-plugin-vue": "^10.1.0",
+    "npm-run-all2": "^8.0.4",
+    "oxlint": "^0.17.0",
+    "prettier": "^3.5.3",
+    "vite": "^6.3.5",
+    "vite-plugin-vue-devtools": "^7.7.6",
+    "wrangler": "^4.18.0"
   }
 }
