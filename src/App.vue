@@ -4,10 +4,10 @@ import { FEATURES } from 'vuefinder/dist/features'
 const features = [FEATURES.PREVIEW, FEATURES.SEARCH, FEATURES.FULL_SCREEN, FEATURES.DOWNLOAD, FEATURES.LANGUAGE]
 const separator = encodeURIComponent('://').toLowerCase()
 
-let [, adapter, path] = window.location.pathname.match(/^\/(\d+(?:\.\d+)+)\/(.*[^/])/) || [, ,]
-if (path && adapter) {
-  const upstream = adapter.startsWith('3') ? 'https://patch.poecdn.com/' : 'https://patch-poe2.poecdn.com/'
-  adapter = upstream + adapter + '/'
+const ADAPTERS = ["poe1", "poe2"]
+let [, adapter, path] = window.location.pathname.match(/^\/(poe1|poe2)\/(.*[^/])/) || [,,]
+if (!adapter) {
+  adapter = ADAPTERS[0]
 }
 
 const request = {
@@ -18,11 +18,13 @@ const request = {
   //     transformed.params = transformResult.params ?? {};
   // }
   transformRequest({ params }) {
-    let version = params.adapter?.split('/').at(-2)
-    if (!version?.match(/^\d+\./) && window.location.pathname.match(/^\/\d+\./)) {
+    let version = params.adapter
+    if (!ADAPTERS.includes(version)) {
       version = window.location.pathname.split('/')[1]
-      const upstream = version.startsWith('3') ? 'https://patch.poecdn.com/' : 'https://patch-poe2.poecdn.com/'
-      params.adapter = upstream + version + '/'
+      if (!ADAPTERS.includes(version)) {
+        version = ADAPTERS[0]
+      }
+      params.adapter = version
     }
 
     if (path && adapter) {
@@ -50,19 +52,15 @@ localStorage.setItem = (key, value) => {
   if (key === 'my_vuefinder_storage') {
     try {
       let { path, adapter } = JSON.parse(value)
-      let version = adapter?.split('/').at(-2)
-      if (!version?.match(/^\d+\./) && window.location.pathname.match(/^\/\d+\./)) {
-        version = window.location.pathname.split('/')[1]
-      }
       const slash = path.startsWith('/') ? '' : '/'
-      window.history.pushState(null, '', `/${version}${slash}${path}`)
+      window.history.pushState(null, '', `/${adapter}${slash}${path}`)
     } catch (e) {
       console.warn(e)
     }
   }
 }
 
-window.addEventListener("popstate", () => window.location.reload())
+window.addEventListener('popstate', () => window.location.reload())
 </script>
 
 <template>
