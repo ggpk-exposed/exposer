@@ -1,11 +1,15 @@
 <script setup>
-import { FEATURES } from 'vuefinder/dist/features'
-
-const features = [FEATURES.PREVIEW, FEATURES.SEARCH, FEATURES.FULL_SCREEN, FEATURES.DOWNLOAD, FEATURES.LANGUAGE]
+const features = {
+  preview: true,
+  search: true,
+  fullscreen: true,
+  download: true,
+  language: true,
+}
 const separator = encodeURIComponent('://').toLowerCase()
 
 const ADAPTERS = ["poe1", "poe2"]
-let [, adapter, path] = window.location.pathname.match(/^\/(poe1|poe2|\d+(?:\.\d+)+)\/(.*[^/])/) || [,,]
+let [, adapter, path] = window.location.pathname.match(/^\/(poe1|poe2|\d+(?:\.\d+)+)\/(.*[^/])/) || [undefined, undefined, undefined]
 if (!ADAPTERS.includes(adapter)) {
   adapter = adapter?.startsWith("3") ? ADAPTERS[0] : ADAPTERS[1];
 }
