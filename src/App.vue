@@ -1,4 +1,6 @@
 <script setup>
+import {VueFinder, RemoteDriver, useVueFinder} from "vuefinder";
+
 const features = {
   preview: true,
   search: true,
@@ -6,65 +8,56 @@ const features = {
   download: true,
   language: true,
 }
-const separator = encodeURIComponent('://').toLowerCase()
 
 const ADAPTERS = ["poe1", "poe2"]
-let [, adapter, path] = window.location.pathname.match(/^\/(poe1|poe2|\d+(?:\.\d+)+)\/(.*[^/])/) || [undefined, undefined, undefined]
-if (!ADAPTERS.includes(adapter)) {
-  adapter = adapter?.startsWith("3") ? ADAPTERS[0] : ADAPTERS[1];
+const separator = encodeURIComponent('://').toLowerCase()
+
+const getInitialPath = () => {
+  const parts = window.location.pathname.split('/').filter(Boolean);
+  let adapter = parts[0];
+  let path = parts.slice(1).join('/');
+
+  if (!adapter) {
+    return "";
+  }
+  if (!ADAPTERS.includes(adapter)) {
+    adapter = adapter?.startsWith("3") ? ADAPTERS[0] : ADAPTERS[1];
+  }
+  return `${adapter}://${path}`;
 }
 
-const request = {
-  baseUrl: import.meta.env.VITE_INDEX_URL,
-
-  // Calling code looks like:
-  // if (transformResult.params != null) {
-  //     transformed.params = transformResult.params ?? {};
-  // }
-  transformRequest({ params }) {
-    let version = params.adapter
-    if (!ADAPTERS.includes(version)) {
-      version = window.location.pathname.split('/')[1]
-      if (!ADAPTERS.includes(version)) {
-        version = version?.startsWith("3") ? ADAPTERS[0] : ADAPTERS[1]
-      }
-      params.adapter = version
-    }
-
-    if (path && adapter) {
-      params.path = path
-      params.adapter = adapter
-      path = ''
-      adapter = ''
-    }
-    if (params.path?.includes('://')) {
-      params.path = params.path?.split('://').at(-1)
-    }
-    if (params.path?.includes(separator)) {
-      params.path = params.path?.toLowerCase()?.split(separator).at(-1)
-    }
-
-    return { params }
-  },
+const config = {
+  initialPath: getInitialPath(),
+  fullScreen: true,
+  persist: true,
 }
 
-// localStorage events don't fire for the tab that created them
-// https://stackoverflow.com/a/75101492/2063518
-const setItem = localStorage.setItem.bind(localStorage)
-localStorage.setItem = (key, value) => {
-  setItem(key, value)
-  if (key === 'my_vuefinder_storage') {
-    try {
-      let { path, adapter } = JSON.parse(value)
-      const slash = path.startsWith('/') ? '' : '/'
-      window.history.pushState(null, '', `/${adapter}${slash}${path}`)
-    } catch (e) {
-      console.warn(e)
-    }
+const driver = new RemoteDriver({
+  baseURL: import.meta.env.VITE_INDEX_URL,
+});
+
+const onPathChange = (path) => {
+  if (!path) return;
+  const [adapter, ...rest] = path.split('://');
+  const actualPath = rest.join('://');
+  const slash = actualPath && !actualPath.startsWith('/') ? '/' : '';
+  const newUrl = `/${adapter}${slash}${actualPath}`;
+  if (window.location.pathname !== newUrl) {
+    window.history.pushState(null, '', newUrl);
   }
 }
 
-window.addEventListener('popstate', () => window.location.reload())
+window.addEventListener('popstate', () => {
+  try {
+    const {open} = useVueFinder('my_vuefinder');
+    const path = getInitialPath();
+    if (path) {
+      open(path);
+    }
+  } catch (e) {
+    console.warn(e);
+  }
+});
 </script>
 
 <template>
@@ -78,7 +71,7 @@ window.addEventListener('popstate', () => window.location.reload())
   </header>
 
   <main>
-    <vue-finder id="my_vuefinder" :request="request" :features="features" :full-screen="true" persist />
+    <vue-finder id="my_vuefinder" :driver="driver" :config="config" :features="features" @path-change="onPathChange" />
   </main>
 </template>
 
