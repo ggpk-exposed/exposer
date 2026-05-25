@@ -10,20 +10,14 @@ const features = {
 }
 
 const ADAPTERS = ["poe1", "poe2"]
-const separator = encodeURIComponent('://').toLowerCase()
 
 const getInitialPath = () => {
-  const parts = window.location.pathname.split('/').filter(Boolean);
-  let adapter = parts[0];
-  let path = parts.slice(1).join('/');
+  let [adapter, path] = window.location.pathname.split('://');
 
-  if (!adapter) {
-    return "";
-  }
   if (!ADAPTERS.includes(adapter)) {
-    adapter = adapter?.startsWith("3") ? ADAPTERS[0] : ADAPTERS[1];
+    adapter = ADAPTERS[0];
   }
-  return `${adapter}://${path}`;
+  return `${adapter}://${path || ""}`;
 }
 
 const config = {
@@ -37,11 +31,10 @@ const driver = new RemoteDriver({
 });
 
 const onPathChange = (path) => {
+  console.log('path change', path);
   if (!path) return;
-  const [adapter, ...rest] = path.split('://');
-  const actualPath = rest.join('://');
-  const slash = actualPath && !actualPath.startsWith('/') ? '/' : '';
-  const newUrl = `/${adapter}${slash}${actualPath}`;
+  const slash = path.includes('/') ? '' : '/';
+  const newUrl = `/${path}${slash}`;
   if (window.location.pathname !== newUrl) {
     window.history.pushState(null, '', newUrl);
   }
@@ -71,7 +64,7 @@ window.addEventListener('popstate', () => {
   </header>
 
   <main>
-    <vue-finder id="my_vuefinder" :driver="driver" :config="config" :features="features" @path-change="onPathChange" />
+    <vue-finder id="my_vuefinder" :driver="driver" :config="config" :features="features" @path-change="onPathChange"/>
   </main>
 </template>
 
