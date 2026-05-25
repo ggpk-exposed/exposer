@@ -7,6 +7,19 @@ const features = {
   fullscreen: true,
   download: true,
   language: true,
+  history: true,
+  theme: true,
+  pinned: true,
+  upload: false,
+  delete: false,
+  rename: false,
+  newfolder: false,
+  newfile: false,
+  move: false,
+  copy: false,
+  archive: false,
+  unarchive: false,
+  edit: false,
 }
 
 const ADAPTERS = ["poe1", "poe2"]
@@ -20,10 +33,13 @@ const getInitialPath = () => {
   return `${adapter}://${path || ""}`;
 }
 
+const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
 const config = {
   initialPath: getInitialPath(),
   fullScreen: true,
   persist: true,
+  theme: isDarkMode ? 'midnight' : 'silver',
 }
 
 const driver = new RemoteDriver({
