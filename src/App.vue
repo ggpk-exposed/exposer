@@ -1,5 +1,5 @@
 <script setup>
-import {VueFinder, RemoteDriver, useVueFinder} from "vuefinder";
+import { VueFinder, RemoteDriver, useVueFinder } from 'vuefinder'
 
 const features = {
   preview: true,
@@ -22,18 +22,25 @@ const features = {
   edit: false,
 }
 
-const ADAPTERS = ["poe1", "poe2"]
+const ADAPTERS = ['poe1', 'poe2']
 
-const getInitialPath = () => {
-  let [adapter, path] = window.location.pathname.split('://');
-
-  if (!ADAPTERS.includes(adapter)) {
-    adapter = ADAPTERS[0];
-  }
-  return `${adapter}://${path || ""}`;
+function strip(s) {
+  const start = +s.startsWith('/'), end = +s.endsWith('/');
+  if (start || end) return s.substring(start, s.length - end);
+  else return s;
 }
 
-const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+const getInitialPath = () => {
+  let [adapter, path] = window.location.pathname.split('://').map(strip);
+  console.debug('initial path', adapter, path);
+
+  if (!ADAPTERS.includes(adapter)) {
+    adapter = ADAPTERS[0]
+  }
+  return `${adapter}://${path || ''}`
+}
+
+const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
 
 const config = {
   initialPath: getInitialPath(),
@@ -44,29 +51,29 @@ const config = {
 
 const driver = new RemoteDriver({
   baseURL: import.meta.env.VITE_INDEX_URL,
-});
+})
 
 const onPathChange = (path) => {
-  console.log('path change', path);
-  if (!path) return;
-  const slash = path.includes('/') ? '' : '/';
-  const newUrl = `/${path}${slash}`;
+  console.log('path change', path)
+  if (!path) return
+  const slash = path.includes('/') ? '' : '/'
+  const newUrl = `/${path}${slash}`
   if (window.location.pathname !== newUrl) {
-    window.history.pushState(null, '', newUrl);
+    window.history.pushState(null, '', newUrl)
   }
 }
 
 window.addEventListener('popstate', () => {
   try {
-    const {open} = useVueFinder('my_vuefinder');
-    const path = getInitialPath();
+    const { open } = useVueFinder('my_vuefinder')
+    const path = getInitialPath()
     if (path) {
-      open(path);
+      open(path)
     }
   } catch (e) {
-    console.warn(e);
+    console.warn(e)
   }
-});
+})
 </script>
 
 <template>
@@ -80,7 +87,7 @@ window.addEventListener('popstate', () => {
   </header>
 
   <main>
-    <vue-finder id="my_vuefinder" :driver="driver" :config="config" :features="features" @path-change="onPathChange"/>
+    <vue-finder id="my_vuefinder" :driver="driver" :config="config" :features="features" @path-change="onPathChange" />
   </main>
 </template>
 
