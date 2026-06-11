@@ -45,7 +45,7 @@ const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme
 const config = {
   initialPath: getInitialPath(),
   fullScreen: true,
-  persist: true,
+  persist: false,
   theme: isDarkMode ? 'midnight' : 'silver',
 }
 
